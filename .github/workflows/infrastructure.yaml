@@ -21,11 +21,17 @@ jobs:
         with:
           terraform_wrapper: false
 
+      - name: Format Terraform configuration
+        working-directory: ./terraform
+        run: terraform fmt
+
       - name: Initialize Terraform
         working-directory: ./terraform
-        run: |
-          terraform init
-          terraform workspace list
+        run: terraform init
+
+      - name: Validate Terraform configuration
+        working-directory: ./terraform
+        run: terraform validate
 
       - name: Select STAGING workspace
         if: ${{ github.ref == 'refs/heads/staging' && github.event_name == 'push' }}
@@ -37,10 +43,10 @@ jobs:
         working-directory: ./terraform
         run: terraform workspace select production
 
-      - name: Terraform plan
+      - name: Plan Terraform configuration
         working-directory: ./terraform
         run: terraform plan -no-color
 
-      - name: Terraform apply
+      - name: Apply Terraform configuration
         working-directory: ./terraform
         run: terraform apply -auto-approve
