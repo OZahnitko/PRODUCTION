@@ -1,0 +1,42 @@
+name: Multi-21, Seb
+on:
+  push:
+    branches:
+      - main
+      - staging
+jobs:
+  terraform:
+    name: Terraform infrastructure
+    runs-on: ubuntu-latest
+    if: ${{ github.ref = 'refs/heads/main' || github.ref = 'refs/heads/staging' }}
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
+
+      - name: cd into Terraform directory
+        run: cd terraform
+
+      - name: Initialize Terraform
+        run: terraform init
+
+      - name: Select STAGING workspace
+        if: ${{ github.ref == 'refs/head/staging' && github.event_name == 'push' }}
+        run: terraform workspace select staging
+
+      - name: Select PRODUCTION workspace
+        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+        run: terraform workspace select production
+
+      - name: Terraform plan
+        run: terraform plan -no-color
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve
