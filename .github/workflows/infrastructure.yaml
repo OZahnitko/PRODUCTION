@@ -55,7 +55,7 @@ jobs:
         working-directory: ./terraform
         run: |
           terraform plan -no-color
-          echo "::set-output name=ree::$(echo ree)"
+          echo "::set-output name=ree::$(echo terraform plan -no-color)"
 
       - uses: actions/github-script@0.9.0
         if: ${{ github.event_name == 'pull_request' }}
