@@ -4,6 +4,8 @@ on:
     branches:
       - main
       - staging
+  pull_request:
+
 jobs:
   terraform:
     name: Terraform infrastructure
