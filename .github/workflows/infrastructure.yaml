@@ -28,7 +28,7 @@ jobs:
           terraform workspace list
 
       - name: Select STAGING workspace
-        if: ${{ github.ref == 'refs/head/staging' && github.event_name == 'push' }}
+        if: ${{ github.ref == 'refs/heads/staging' && github.event_name == 'push' }}
         working-directory: ./terraform
         run: terraform workspace select staging
 
