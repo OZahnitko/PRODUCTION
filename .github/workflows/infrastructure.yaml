@@ -54,7 +54,7 @@ jobs:
         id: plan
         working-directory: ./terraform
         run: |
-          terraform plan -no-color > plan.log
+          terraform plan -no-color > ../plan.log
 
       - uses: actions/github-script@0.9.0
         if: ${{ github.event_name == 'pull_request' }}
