@@ -22,7 +22,9 @@ jobs:
           terraform_wrapper: false
 
       - name: cd into Terraform directory
-        run: cd terraform
+        run: |
+          cd terraform
+          ls -la
 
       - name: Initialize Terraform
         run: terraform init
