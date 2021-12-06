@@ -27,16 +27,19 @@ jobs:
           terraform init
           terraform workspace list
 
-      # - name: Select STAGING workspace
-      #   if: ${{ github.ref == 'refs/head/staging' && github.event_name == 'push' }}
-      #   run: terraform workspace select staging
+      - name: Select STAGING workspace
+        if: ${{ github.ref == 'refs/head/staging' && github.event_name == 'push' }}
+        working-directory: ./terraform
+        run: terraform workspace select staging
 
-      # - name: Select PRODUCTION workspace
-      #   if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
-      #   run: terraform workspace select production
+      - name: Select PRODUCTION workspace
+        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+        working-directory: ./terraform
+        run: terraform workspace select production
 
-      # - name: Terraform plan
-      #   run: terraform plan -no-color
+      - name: Terraform plan
+        working-directory: ./terraform
+        run: terraform plan -no-color
 
       # - name: Terraform apply
       #   run: terraform apply -auto-approve
