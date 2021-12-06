@@ -9,7 +9,7 @@ on:
 jobs:
   terraform:
     name: Terraform infrastructure
-    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging' }}
+    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging' || github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     environment: PRODUCTION
     env:
