@@ -4,10 +4,12 @@ on:
     branches:
       - main
       - staging
+  pull_request:
+
 jobs:
   terraform:
     name: Terraform infrastructure
-    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging' }}
+    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging' || github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     environment: PRODUCTION
     env:
@@ -23,14 +25,17 @@ jobs:
           terraform_wrapper: false
 
       - name: Format Terraform configuration
+        id: fmt
         working-directory: ./terraform
         run: terraform fmt
 
       - name: Initialize Terraform
+        id: init
         working-directory: ./terraform
         run: terraform init
 
       - name: Validate Terraform configuration
+        id: validate
         working-directory: ./terraform
         run: terraform validate
 
@@ -46,16 +51,18 @@ jobs:
         run: terraform workspace select production
 
       - name: Plan Terraform configuration
+        id: plan
         working-directory: ./terraform
-        run: terraform plan -no-color
+        run: |
+          terraform plan -no-color > ../plan.log
 
       - uses: actions/github-script@0.9.0
-        if: ${{ github.ref == 'refs/heads/staging' && github.event_name == 'pull_request' }}
-        env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+        if: ${{ github.event_name == 'pull_request' }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const fs = require('fs')
+            const plan = fs.readFileSync("plan.log")
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
@@ -64,7 +71,9 @@ jobs:
             <details><summary>Show Plan</summary>
 
             \`\`\`\n
-            ${process.env.PLAN}
+            Terraform Plan
+
+            ${ plan }
             \`\`\`
 
             </details>
